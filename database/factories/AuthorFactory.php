@@ -20,7 +20,7 @@ class AuthorFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'last_name' => $this->faker->lastName(),
-            'nacionality' => $this->faker->country(),
+            'nationality' => $this->faker->country(),
             'birth_date' => $this->faker->date(),
         ];
     }
