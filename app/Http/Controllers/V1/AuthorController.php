@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ListAuthorsRequest;
+use App\Http\Requests\SaveAuthorRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -24,7 +25,7 @@ class AuthorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(SaveAuthorRequest $request): JsonResponse
     {
         return response()->json(status: Response::HTTP_CREATED, data: [
             'message' => 'Author created successfully',
@@ -44,7 +45,7 @@ class AuthorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(SaveAuthorRequest $request, string $id): JsonResponse
     {
         return response(status: Response::HTTP_OK)->json(status: Response::HTTP_OK, data: [
             'message' => 'Author updated successfully',
