@@ -5,6 +5,8 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ListAuthorsRequest;
 use App\Http\Requests\SaveAuthorRequest;
+use App\Http\Resources\AuthorCollection;
+use App\Http\Resources\AuthorResource;
 use App\Models\Author;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -26,7 +28,7 @@ class AuthorController extends Controller
             ->when(isset($filters['sort']), fn($query) => $query->orderBy($filters['sort']))
             ->paginate($filters['per_page'] ?? 15, ['*'], 'page', $filters['page'] ?? 1);
 
-        return response()->json(status: Response::HTTP_OK, data: $results);
+        return response()->json(status: Response::HTTP_OK, data: AuthorCollection::make($results));
     }
 
     /**
@@ -37,7 +39,7 @@ class AuthorController extends Controller
         $result = Author::create($request->validated());
         return response()->json(status: Response::HTTP_CREATED, data: [
             'message' => 'Author created successfully',
-            'data' => $result,
+            'data' => AuthorResource::make($result),
         ]);
     }
 
@@ -48,7 +50,7 @@ class AuthorController extends Controller
     {
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Author details',
-            'data' => $author,
+            'data' => AuthorResource::make($author),
         ]);
     }
 
@@ -61,7 +63,7 @@ class AuthorController extends Controller
 
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Author updated successfully',
-            'data' => $author->refresh(),
+            'data' => AuthorResource::make($author),
         ]);
     }
 
