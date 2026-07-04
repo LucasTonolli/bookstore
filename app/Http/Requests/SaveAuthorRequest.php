@@ -25,7 +25,7 @@ class SaveAuthorRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'nacionality' => ['required', 'string', 'max:255'],
+            'nationality' => ['required', 'string', 'max:255'],
             'birth_date' => ['required', 'date', 'before:today'],
         ];
     }

@@ -18,7 +18,7 @@ class AuthorResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'last_name' => $this->last_name,
-            'nacionality' => $this->nacionality,
+            'nationality' => $this->nationality,
             'birth_date' => $this->birth_date->toDateString(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
