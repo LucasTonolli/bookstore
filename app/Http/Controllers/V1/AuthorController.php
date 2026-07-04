@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ListAuthorsRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -12,8 +13,9 @@ class AuthorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(ListAuthorsRequest $request): JsonResponse
     {
+        $filters = $request->validated();
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'List of authors',
         ]);
