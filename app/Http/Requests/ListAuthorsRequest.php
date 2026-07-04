@@ -25,9 +25,10 @@ class ListAuthorsRequest extends FormRequest
         return [
             'name' => ['string', 'max:255'],
             'last_name' => ['string', 'max:255'],
-            'nacionality' => ['string', 'max:255'],
+            'nationality' => ['string', 'max:255'],
             'birth_date' => ['date'],
             'sort'      => ['sometimes', 'in:name,created_at'],
+            'direction' => ['sometimes', 'in:asc,desc'],
             'per_page'  => ['sometimes', 'integer', 'min:1', 'max:100'],
             'page'      => ['sometimes', 'integer', 'min:1'],
         ];

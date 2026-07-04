@@ -23,9 +23,9 @@ class AuthorController extends Controller
         $results = Author::query()
             ->when(isset($filters['name']), fn($query) => $query->where('name', 'like', "%{$filters['name']}%"))
             ->when(isset($filters['last_name']), fn($query) => $query->where('last_name', 'like', "%{$filters['last_name']}%"))
-            ->when(isset($filters['nacionality']), fn($query) => $query->where('nacionality', 'like', "%{$filters['nacionality']}%"))
+            ->when(isset($filters['nationality']), fn($query) => $query->where('nationality', 'like', "%{$filters['nationality']}%"))
             ->when(isset($filters['birth_date']), fn($query) => $query->whereDate('birth_date', $filters['birth_date']))
-            ->when(isset($filters['sort']), fn($query) => $query->orderBy($filters['sort']))
+            ->when(isset($filters['sort']), fn($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
             ->paginate($filters['per_page'] ?? 15, ['*'], 'page', $filters['page'] ?? 1);
 
         return response()->json(status: Response::HTTP_OK, data: AuthorCollection::make($results));
