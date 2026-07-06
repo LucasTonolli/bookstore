@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Stringable;
 
 #[Fillable('name', 'slug')]
 class Genre extends Model
@@ -14,7 +13,7 @@ class Genre extends Model
     /** @use HasFactory<\Database\Factories\GenreFactory> */
     use HasFactory;
 
-    protected static function boot(): void
+    protected static function booted(): void
     {
         static::creating(function (Genre $genre) {
             $genre->slug = $genre->generateSlug($genre->name);
