@@ -4,6 +4,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ListBooksRequest;
+use App\Http\Requests\StoreBookRequest;
+use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -42,11 +44,11 @@ class BookController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBookRequest $request)
     {
         return response()->json(status: Response::HTTP_CREATED, data: [
             'message' => 'Book created successfully',
-            'data' => Book::create($request->all()),
+            'data' => Book::create($request->validated()),
         ]);
     }
 
@@ -64,9 +66,9 @@ class BookController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Book $book): JsonResponse
+    public function update(UpdateBookRequest $request, Book $book): JsonResponse
     {
-        $book->update($request->all());
+        $book->update($request->validated());
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Book updated successfully',
             'data' => $book,
