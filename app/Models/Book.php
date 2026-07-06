@@ -37,11 +37,11 @@ class Book extends Model
     protected static function booted(): void
     {
         static::creating(function (Book $book) {
-            $book->slug = $this->generateSlug($book);
+            $book->slug = $book->generateSlug($book);
         });
 
         static::updating(function (Book $book) {
-            $book->slug = $this->generateSlug($book);
+            $book->slug = $book->generateSlug($book);
         });
     }
 
