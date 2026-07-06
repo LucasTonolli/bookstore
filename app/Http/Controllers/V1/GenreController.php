@@ -5,6 +5,8 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ListGenresRequest;
 use App\Http\Requests\SaveGenreRequest;
+use App\Http\Resources\GenreCollection;
+use App\Http\Resources\GenreResource;
 use App\Models\Genre;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,18 +19,14 @@ class GenreController extends Controller
      */
     public function index(ListGenresRequest $request): JsonResponse
     {
-        $genres = Genre::query();
         $filters = $request->validated();
 
-        $results = $genres
+        $results = Genre::query()
             ->when(isset($filters['name']), fn($query) => $query->where('name', 'like', "%{$filters['name']}%"))
             ->when(isset($filters['sort']), fn($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
             ->paginate($filters['per_page'] ?? 15, ['*'], 'page', $filters['page'] ?? 1);
 
-        return response()->json(status: Response::HTTP_OK, data: [
-            'message' => 'List of genres',
-            'data' => $results,
-        ]);
+        return response()->json(status: Response::HTTP_OK, data: GenreCollection::make($results));
     }
 
     /**
@@ -36,9 +34,11 @@ class GenreController extends Controller
      */
     public function store(SaveGenreRequest $request)
     {
+        $genre = Genre::create($request->validated());
+
         return response()->json(status: Response::HTTP_CREATED, data: [
             'message' => 'Genre created successfully',
-            'data' => Genre::create($request->all()),
+            'data' => GenreResource::make($genre),
         ]);
     }
 
@@ -49,7 +49,7 @@ class GenreController extends Controller
     {
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Genre found',
-            'data' => $genre,
+            'data' => GenreResource::make($genre),
         ]);
     }
 
