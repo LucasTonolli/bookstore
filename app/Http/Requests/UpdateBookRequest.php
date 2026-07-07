@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBookRequest extends FormRequest
 {
@@ -26,7 +27,7 @@ class UpdateBookRequest extends FormRequest
             'title' => ['sometimes', 'string', 'max:255'],
             'subtitle' => ['string', 'max:255'],
             'published_year' => ['integer', 'min:0'],
-            'isbn' => ['sometimes', 'string', 'max:13', 'unique:books', 'ignore:' . $this->book->id],
+            'isbn' => ['sometimes', 'string', 'max:13', Rule::unique('books')->ignore($this->book->id)],
             'pages' => ['sometimes', 'integer', 'min:1'],
             'edition' => ['string', 'max:255'],
             'publisher' => ['string', 'max:255'],
