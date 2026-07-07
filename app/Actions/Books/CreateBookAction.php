@@ -24,7 +24,7 @@ class CreateBookAction
 
             $book->authors()->attach($data['authors'] ?? []);
             $book->genres()->attach($data['genres'] ?? []);
-
+            $book->load(['authors', 'genres']);
             return $book;
         });
     }

@@ -23,6 +23,8 @@ class UpdateBookAction
                 $book->genres()->sync($data['genres']);
             }
 
+            $book->load(['authors', 'genres']);
+
             return $book;
         });
     }
