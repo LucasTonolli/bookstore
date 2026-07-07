@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Actions\Books\CreateBookAction;
+use App\Actions\Books\UpdateBookAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ListBooksRequest;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
+use App\Http\Resources\BookCollection;
+use App\Http\Resources\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -35,20 +39,25 @@ class BookController extends Controller
             ->when(isset($filters['sort']), fn($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
             ->paginate($filters['per_page'] ?? 15, ['*'], 'page', $filters['page'] ?? 1);
 
-        return response()->json(status: Response::HTTP_OK, data: [
-            'message' => 'Books retrieved successfully',
-            'data' => $results,
-        ]);
+        return response()->json(status: Response::HTTP_OK, data: BookCollection::make($results));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreBookRequest $request)
+    public function store(StoreBookRequest $request, CreateBookAction $action): JsonResponse
     {
+        try {
+            $book = $action->handle($request->validated());
+        } catch (\Exception $e) {
+            return response()->json(status: Response::HTTP_INTERNAL_SERVER_ERROR, data: [
+                'message' => 'Failed to create book',
+                'error' => $e->getMessage(),
+            ]);
+        }
         return response()->json(status: Response::HTTP_CREATED, data: [
             'message' => 'Book created successfully',
-            'data' => Book::create($request->validated()),
+            'data' => BookResource::make($book),
         ]);
     }
 
@@ -59,19 +68,26 @@ class BookController extends Controller
     {
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Book found',
-            'data' => $book,
+            'data' => BookResource::make($book),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBookRequest $request, Book $book): JsonResponse
+    public function update(UpdateBookRequest $request, Book $book, UpdateBookAction $action): JsonResponse
     {
-        $book->update($request->validated());
+        try {
+            $book = $action->handle($book, $request->validated());
+        } catch (\Exception $e) {
+            return response()->json(status: Response::HTTP_INTERNAL_SERVER_ERROR, data: [
+                'message' => 'Failed to update book',
+                'error' => $e->getMessage(),
+            ]);
+        }
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Book updated successfully',
-            'data' => $book,
+            'data' => BookResource::make($book),
         ]);
     }
 
