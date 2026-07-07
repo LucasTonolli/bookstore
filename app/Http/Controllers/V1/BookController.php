@@ -11,7 +11,6 @@ use App\Http\Requests\UpdateBookRequest;
 use App\Http\Resources\BookCollection;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 
@@ -37,6 +36,7 @@ class BookController extends Controller
             ->when(isset($filters['language']), fn($query) => $query->where('language', 'like', "%{$filters['language']}%"))
             ->when(isset($filters['description']), fn($query) => $query->where('description', 'like', "%{$filters['description']}%"))
             ->when(isset($filters['sort']), fn($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
+            ->with(['authors', 'genres'])
             ->paginate($filters['per_page'] ?? 15, ['*'], 'page', $filters['page'] ?? 1);
 
         return response()->json(status: Response::HTTP_OK, data: BookCollection::make($results));
@@ -66,6 +66,8 @@ class BookController extends Controller
      */
     public function show(Book $book): JsonResponse
     {
+        $book->load(['authors', 'genres']);
+
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Book found',
             'data' => BookResource::make($book),
