@@ -32,7 +32,7 @@ class ListBooksRequest extends FormRequest
             'publisher' => ['string', 'max:255'],
             'language' => ['string', 'max:255'],
             'description' => ['string'],
-            'sort'      => ['sometimes', 'in:name,created_at'],
+            'sort'      => ['sometimes', 'in:title,created_at'],
             'direction' => ['sometimes', 'in:asc,desc'],
             'per_page'  => ['sometimes', 'integer', 'min:1', 'max:100'],
             'page'      => ['sometimes', 'integer', 'min:1'],
