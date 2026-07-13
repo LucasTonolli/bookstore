@@ -39,6 +39,8 @@ Each resource exposes standard REST endpoints:
 | PUT/PATCH | `/api/v1/books/{id}`    | Update a book (syncs `authors`/`genres` if provided)                                               |
 | DELETE    | `/api/v1/books/{id}`    | Delete a book                                                                                      |
 | POST      | `/api/v1/auth/register` | Register user                                                                                      |
+| POST      | `/api/v1/auth/login`    | Login                                                                                              |
+| DELETE    | `/api/v1/auth/logout`   | Logout                                                                                             |
 
 ## Getting Started
 
