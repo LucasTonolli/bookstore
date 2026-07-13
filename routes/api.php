@@ -12,4 +12,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('authors', \App\Http\Controllers\V1\AuthorController::class);
     Route::apiResource('genres', \App\Http\Controllers\V1\GenreController::class);
     Route::apiResource('books', \App\Http\Controllers\V1\BookController::class);
+
+    Route::prefix('/auth')->group(function () {
+        Route::post('/register', \App\Http\Controllers\V1\Auth\RegisterController::class);
+    });
 });
