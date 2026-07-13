@@ -30,10 +30,10 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request): Response
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(status: Response::HTTP_NO_CONTENT);
+        return response()->noContent();
     }
 }

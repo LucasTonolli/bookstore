@@ -11,6 +11,7 @@ use App\Models\Genre;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Http;
 
 class GenreController extends Controller
 {
@@ -69,9 +70,9 @@ class GenreController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Genre $genre): JsonResponse
+    public function destroy(Genre $genre): Response
     {
         $genre->delete();
-        return response()->json(status: Response::HTTP_NO_CONTENT);
+        return response()->noContent();
     }
 }
