@@ -15,5 +15,6 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('/auth')->group(function () {
         Route::post('/register', \App\Http\Controllers\V1\Auth\RegisterController::class);
+        Route::post('/login', [\App\Http\Controllers\V1\Auth\AuthController::class, 'login']);
     });
 });
