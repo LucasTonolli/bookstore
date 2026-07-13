@@ -4,11 +4,10 @@ namespace App\Http\Controllers\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
-use App\Models\User;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -16,13 +15,13 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        $user = User::where('email', '=', $validated['email'])->first();
-
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
-            return response()->json(status: 401, data: [
+        if (!Auth::attempt($validated)) {
+            return response()->json(status: Response::HTTP_UNAUTHORIZED, data: [
                 'message' => 'The provided credentials are incorrect.'
             ]);
         }
+
+        $user = Auth::user();
 
         return response()->json(status: Response::HTTP_OK, data: [
             'token' => $user->createToken('token')->plainTextToken,
