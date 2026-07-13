@@ -70,10 +70,10 @@ class AuthorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Author $author): JsonResponse
+    public function destroy(Author $author): Response
     {
         $author->delete();
 
-        return response()->json(status: Response::HTTP_NO_CONTENT);
+        return response()->noContent();
     }
 }
