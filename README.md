@@ -21,23 +21,24 @@ A REST API for managing a bookstore catalog — authors, genres, and books — b
 
 Each resource exposes standard REST endpoints:
 
-| Method | URI | Description |
-|---|---|---|
-| GET | `/api/v1/authors` | List authors (filter by `name`, `last_name`, `nationality`, `birth_date`; sort/paginate) |
-| POST | `/api/v1/authors` | Create an author |
-| GET | `/api/v1/authors/{id}` | Show an author |
-| PUT/PATCH | `/api/v1/authors/{id}` | Update an author |
-| DELETE | `/api/v1/authors/{id}` | Delete an author |
-| GET | `/api/v1/genres` | List genres (filter by `name`; sort/paginate) |
-| POST | `/api/v1/genres` | Create a genre |
-| GET | `/api/v1/genres/{id}` | Show a genre |
-| PUT/PATCH | `/api/v1/genres/{id}` | Update a genre |
-| DELETE | `/api/v1/genres/{id}` | Delete a genre |
-| GET | `/api/v1/books` | List books with authors/genres loaded (filter by title, isbn, published_year, etc.; sort/paginate) |
-| POST | `/api/v1/books` | Create a book (requires `authors` and `genres` id arrays) |
-| GET | `/api/v1/books/{id}` | Show a book |
-| PUT/PATCH | `/api/v1/books/{id}` | Update a book (syncs `authors`/`genres` if provided) |
-| DELETE | `/api/v1/books/{id}` | Delete a book |
+| Method    | URI                     | Description                                                                                        |
+| --------- | ----------------------- | -------------------------------------------------------------------------------------------------- |
+| GET       | `/api/v1/authors`       | List authors (filter by `name`, `last_name`, `nationality`, `birth_date`; sort/paginate)           |
+| POST      | `/api/v1/authors`       | Create an author                                                                                   |
+| GET       | `/api/v1/authors/{id}`  | Show an author                                                                                     |
+| PUT/PATCH | `/api/v1/authors/{id}`  | Update an author                                                                                   |
+| DELETE    | `/api/v1/authors/{id}`  | Delete an author                                                                                   |
+| GET       | `/api/v1/genres`        | List genres (filter by `name`; sort/paginate)                                                      |
+| POST      | `/api/v1/genres`        | Create a genre                                                                                     |
+| GET       | `/api/v1/genres/{id}`   | Show a genre                                                                                       |
+| PUT/PATCH | `/api/v1/genres/{id}`   | Update a genre                                                                                     |
+| DELETE    | `/api/v1/genres/{id}`   | Delete a genre                                                                                     |
+| GET       | `/api/v1/books`         | List books with authors/genres loaded (filter by title, isbn, published_year, etc.; sort/paginate) |
+| POST      | `/api/v1/books`         | Create a book (requires `authors` and `genres` id arrays)                                          |
+| GET       | `/api/v1/books/{id}`    | Show a book                                                                                        |
+| PUT/PATCH | `/api/v1/books/{id}`    | Update a book (syncs `authors`/`genres` if provided)                                               |
+| DELETE    | `/api/v1/books/{id}`    | Delete a book                                                                                      |
+| POST      | `/api/v1/auth/register` | Register user                                                                                      |
 
 ## Getting Started
 
