@@ -10,9 +10,20 @@ use App\Http\Resources\AuthorResource;
 use App\Models\Author;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class AuthorController extends Controller
+class AuthorController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(middleware: 'auth:sanctum', only: ['store', 'update', 'destroy']),
+            new Middleware(middleware: ['abilities:author:create'], only: ['store']),
+            new Middleware(middleware: ['abilities:author:update'], only: ['update']),
+            new Middleware(middleware: ['abilities:author:delete'], only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */

@@ -9,12 +9,21 @@ use App\Http\Resources\GenreCollection;
 use App\Http\Resources\GenreResource;
 use App\Models\Genre;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class GenreController extends Controller
+class GenreController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(middleware: 'auth:sanctum', only: ['store', 'update', 'destroy']),
+            new Middleware(middleware: ['abilities:genre:create'], only: ['store']),
+            new Middleware(middleware: ['abilities:genre:update'], only: ['update']),
+            new Middleware(middleware: ['abilities:genre:delete'], only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
@@ -33,7 +42,7 @@ class GenreController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(SaveGenreRequest $request)
+    public function store(SaveGenreRequest $request): JsonResponse
     {
         $genre = Genre::create($request->validated());
 
@@ -63,7 +72,7 @@ class GenreController extends Controller
         $genre->update($request->validated());
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Genre updated successfully',
-            'data' => $genre,
+            'data' => GenreResource::make($genre),
         ]);
     }
 

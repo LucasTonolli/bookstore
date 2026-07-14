@@ -33,4 +33,12 @@ class User extends Authenticatable
             'role' => Roles::class
         ];
     }
+
+    public function permissions(): array
+    {
+        if (!$this->role) {
+            return [];
+        }
+        return $this->role->permissions();
+    }
 }

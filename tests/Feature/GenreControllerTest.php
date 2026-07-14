@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Genre;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
 
@@ -58,6 +60,8 @@ it('rejects invalid filters', function () {
 });
 
 it('creates a new genre and generates a slug', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:create']);
+
     $response = $this->postJson('/api/v1/genres', ['name' => 'Fantasy']);
 
     $response->assertCreated()
@@ -72,6 +76,7 @@ it('creates a new genre and generates a slug', function () {
 });
 
 it('generates a unique slug when the name is already used', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:create']);
     Genre::factory()->create(['name' => 'Fantasy', 'slug' => 'fantasy']);
 
     $response = $this->postJson('/api/v1/genres', ['name' => 'Fantasy']);
@@ -81,10 +86,26 @@ it('generates a unique slug when the name is already used', function () {
 });
 
 it('requires a name when creating a genre', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:create']);
+
     $response = $this->postJson('/api/v1/genres', []);
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['name']);
+});
+
+it('rejects creating a genre without authentication', function () {
+    $response = $this->postJson('/api/v1/genres', ['name' => 'Fantasy']);
+
+    $response->assertUnauthorized();
+});
+
+it('rejects creating a genre without the genre:create ability', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:update']);
+
+    $response = $this->postJson('/api/v1/genres', ['name' => 'Fantasy']);
+
+    $response->assertForbidden();
 });
 
 it('returns the specified genre', function () {
@@ -105,6 +126,8 @@ it('returns not found when showing a missing genre', function () {
 });
 
 it('modifies the specified genre and regenerates the slug', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:update']);
+
     $genre = Genre::factory()->create(['name' => 'Fantasy', 'slug' => 'fantasy']);
 
     $response = $this->putJson("/api/v1/genres/{$genre->id}", ['name' => 'Horror']);
@@ -122,6 +145,8 @@ it('modifies the specified genre and regenerates the slug', function () {
 });
 
 it('requires a name when updating a genre', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:update']);
+
     $genre = Genre::factory()->create();
 
     $response = $this->putJson("/api/v1/genres/{$genre->id}", []);
@@ -131,12 +156,33 @@ it('requires a name when updating a genre', function () {
 });
 
 it('returns not found when updating a missing genre', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:update']);
+
     $response = $this->putJson('/api/v1/genres/999', ['name' => 'Fantasy']);
 
     $response->assertNotFound();
 });
 
+it('rejects updating a genre without authentication', function () {
+    $genre = Genre::factory()->create();
+
+    $response = $this->putJson("/api/v1/genres/{$genre->id}", ['name' => 'Horror']);
+
+    $response->assertUnauthorized();
+});
+
+it('rejects updating a genre without the genre:update ability', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:create']);
+    $genre = Genre::factory()->create();
+
+    $response = $this->putJson("/api/v1/genres/{$genre->id}", ['name' => 'Horror']);
+
+    $response->assertForbidden();
+});
+
 it('deletes the specified genre', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:delete']);
+
     $genre = Genre::factory()->create();
 
     $response = $this->deleteJson("/api/v1/genres/{$genre->id}");
@@ -147,7 +193,26 @@ it('deletes the specified genre', function () {
 });
 
 it('returns not found when deleting a missing genre', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:delete']);
+
     $response = $this->deleteJson('/api/v1/genres/999');
 
     $response->assertNotFound();
+});
+
+it('rejects deleting a genre without authentication', function () {
+    $genre = Genre::factory()->create();
+
+    $response = $this->deleteJson("/api/v1/genres/{$genre->id}");
+
+    $response->assertUnauthorized();
+});
+
+it('rejects deleting a genre without the genre:delete ability', function () {
+    Sanctum::actingAs(User::factory()->create(), ['genre:create']);
+    $genre = Genre::factory()->create();
+
+    $response = $this->deleteJson("/api/v1/genres/{$genre->id}");
+
+    $response->assertForbidden();
 });

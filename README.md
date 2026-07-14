@@ -9,13 +9,14 @@ A REST API for managing a bookstore catalog — authors, genres, and books — b
 - Filtering, sorting, and pagination on list endpoints
 - Auto-generated, collision-safe slugs for genres and books
 - Form Request validation, API Resources for responses, and Action classes for the book create/update flow
+- Write endpoints (`store`/`update`/`destroy`) require a Sanctum token with the matching ability (e.g. `author:create`, `book:delete`); reads are public
 
 ## Tech Stack
 
 - PHP 8.5, Laravel 13
 - SQLite (default local database)
 - Pest 4 for testing
-- Laravel Sanctum (installed, not yet applied to the catalog routes)
+- Laravel Sanctum for token auth and per-token abilities
 
 ## API Endpoints
 

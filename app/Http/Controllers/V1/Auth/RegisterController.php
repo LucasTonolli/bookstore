@@ -30,7 +30,7 @@ class RegisterController extends Controller
 
             return [
                 $user,
-                $user->createToken('token')
+                $user->createToken('token', $user->permissions())
             ];
         });
 

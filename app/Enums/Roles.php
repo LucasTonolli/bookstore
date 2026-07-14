@@ -16,4 +16,32 @@ enum Roles: string
             Roles::Admin => 'Admin',
         };
     }
+
+    public function permissions(): array
+    {
+        return match ($this) {
+            self::Staff => [
+                'book:read',
+                'genre:read',
+                'author:read',
+                'book:create',
+                'genre:create',
+                'author:create',
+                'book:update',
+                'genre:update',
+                'author:update',
+                'book:delete',
+                'genre:delete',
+                'author:delete',
+            ],
+            self::Client => [
+                'book:read',
+                'genre:read',
+                'author:read',
+            ],
+            self::Admin => [
+                '*',
+            ],
+        };
+    }
 }

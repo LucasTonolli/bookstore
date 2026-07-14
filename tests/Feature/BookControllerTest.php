@@ -3,7 +3,9 @@
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Genre;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
 
@@ -96,6 +98,8 @@ it('loads authors and genres relationships when listing books', function () {
 });
 
 it('creates a new book with authors and genres', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:create']);
+
     $author = Author::factory()->create();
     $genre = Genre::factory()->create();
 
@@ -128,6 +132,8 @@ it('creates a new book with authors and genres', function () {
 });
 
 it('requires required fields when creating a book', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:create']);
+
     $response = $this->postJson('/api/v1/books', []);
 
     $response->assertUnprocessable()
@@ -135,6 +141,7 @@ it('requires required fields when creating a book', function () {
 });
 
 it('rejects a duplicate isbn when creating a book', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:create']);
     Book::factory()->create(['isbn' => '1234567890123']);
     $author = Author::factory()->create();
     $genre = Genre::factory()->create();
@@ -152,6 +159,8 @@ it('rejects a duplicate isbn when creating a book', function () {
 });
 
 it('rejects nonexistent author or genre ids when creating a book', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:create']);
+
     $response = $this->postJson('/api/v1/books', [
         'title' => 'Another Book',
         'isbn' => '1234567890123',
@@ -162,6 +171,37 @@ it('rejects nonexistent author or genre ids when creating a book', function () {
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['authors', 'genres']);
+});
+
+it('rejects creating a book without authentication', function () {
+    $author = Author::factory()->create();
+    $genre = Genre::factory()->create();
+
+    $response = $this->postJson('/api/v1/books', [
+        'title' => 'Another Book',
+        'isbn' => '1234567890123',
+        'pages' => 100,
+        'authors' => [$author->id],
+        'genres' => [$genre->id],
+    ]);
+
+    $response->assertUnauthorized();
+});
+
+it('rejects creating a book without the book:create ability', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:update']);
+    $author = Author::factory()->create();
+    $genre = Genre::factory()->create();
+
+    $response = $this->postJson('/api/v1/books', [
+        'title' => 'Another Book',
+        'isbn' => '1234567890123',
+        'pages' => 100,
+        'authors' => [$author->id],
+        'genres' => [$genre->id],
+    ]);
+
+    $response->assertForbidden();
 });
 
 it('returns the specified book', function () {
@@ -185,6 +225,8 @@ it('returns not found when showing a missing book', function () {
 });
 
 it('modifies the specified book', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:update']);
+
     $book = Book::factory()->create();
 
     $response = $this->putJson("/api/v1/books/{$book->id}", [
@@ -199,6 +241,8 @@ it('modifies the specified book', function () {
 });
 
 it('allows keeping a book\'s own unchanged isbn on update', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:update']);
+
     $book = Book::factory()->create(['isbn' => '1234567890123']);
 
     $response = $this->putJson("/api/v1/books/{$book->id}", [
@@ -210,6 +254,7 @@ it('allows keeping a book\'s own unchanged isbn on update', function () {
 });
 
 it('rejects updating a book to another book\'s isbn', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:update']);
     Book::factory()->create(['isbn' => '1111111111111']);
     $book = Book::factory()->create(['isbn' => '2222222222222']);
 
@@ -222,6 +267,8 @@ it('rejects updating a book to another book\'s isbn', function () {
 });
 
 it('syncs authors and genres when updating a book', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:update']);
+
     $book = Book::factory()->create();
     $oldAuthor = Author::factory()->create();
     $newAuthor = Author::factory()->create();
@@ -240,12 +287,33 @@ it('syncs authors and genres when updating a book', function () {
 });
 
 it('returns not found when updating a missing book', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:update']);
+
     $response = $this->putJson('/api/v1/books/999', ['title' => 'Updated Title']);
 
     $response->assertNotFound();
 });
 
+it('rejects updating a book without authentication', function () {
+    $book = Book::factory()->create();
+
+    $response = $this->putJson("/api/v1/books/{$book->id}", ['title' => 'Updated Title']);
+
+    $response->assertUnauthorized();
+});
+
+it('rejects updating a book without the book:update ability', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:create']);
+    $book = Book::factory()->create();
+
+    $response = $this->putJson("/api/v1/books/{$book->id}", ['title' => 'Updated Title']);
+
+    $response->assertForbidden();
+});
+
 it('deletes the specified book', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:delete']);
+
     $book = Book::factory()->create();
 
     $response = $this->deleteJson("/api/v1/books/{$book->id}");
@@ -256,7 +324,26 @@ it('deletes the specified book', function () {
 });
 
 it('returns not found when deleting a missing book', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:delete']);
+
     $response = $this->deleteJson('/api/v1/books/999');
 
     $response->assertNotFound();
+});
+
+it('rejects deleting a book without authentication', function () {
+    $book = Book::factory()->create();
+
+    $response = $this->deleteJson("/api/v1/books/{$book->id}");
+
+    $response->assertUnauthorized();
+});
+
+it('rejects deleting a book without the book:delete ability', function () {
+    Sanctum::actingAs(User::factory()->create(), ['book:create']);
+    $book = Book::factory()->create();
+
+    $response = $this->deleteJson("/api/v1/books/{$book->id}");
+
+    $response->assertForbidden();
 });
