@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Author;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
 
@@ -102,6 +104,8 @@ it('rejects invalid filters', function () {
 });
 
 it('creates a new author', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:create']);
+
     $payload = [
         'name' => 'Machado',
         'last_name' => 'de Assis',
@@ -126,6 +130,8 @@ it('creates a new author', function () {
 });
 
 it('requires all fields when creating an author', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:create']);
+
     $response = $this->postJson('/api/v1/authors', []);
 
     $response->assertUnprocessable()
@@ -133,6 +139,8 @@ it('requires all fields when creating an author', function () {
 });
 
 it('rejects a birth_date in the future when creating an author', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:create']);
+
     $response = $this->postJson('/api/v1/authors', [
         'name' => 'Machado',
         'last_name' => 'de Assis',
@@ -142,6 +150,30 @@ it('rejects a birth_date in the future when creating an author', function () {
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['birth_date']);
+});
+
+it('rejects creating an author without authentication', function () {
+    $response = $this->postJson('/api/v1/authors', [
+        'name' => 'Machado',
+        'last_name' => 'de Assis',
+        'nationality' => 'Brazil',
+        'birth_date' => '1839-06-21',
+    ]);
+
+    $response->assertUnauthorized();
+});
+
+it('rejects creating an author without the author:create ability', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:update']);
+
+    $response = $this->postJson('/api/v1/authors', [
+        'name' => 'Machado',
+        'last_name' => 'de Assis',
+        'nationality' => 'Brazil',
+        'birth_date' => '1839-06-21',
+    ]);
+
+    $response->assertForbidden();
 });
 
 it('returns the specified author', function () {
@@ -162,6 +194,8 @@ it('returns not found when showing a missing author', function () {
 });
 
 it('modifies the specified author', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:update']);
+
     $author = Author::factory()->create();
 
     $payload = [
@@ -184,6 +218,8 @@ it('modifies the specified author', function () {
 });
 
 it('requires all fields when updating an author', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:update']);
+
     $author = Author::factory()->create();
 
     $response = $this->putJson("/api/v1/authors/{$author->id}", []);
@@ -193,6 +229,8 @@ it('requires all fields when updating an author', function () {
 });
 
 it('returns not found when updating a missing author', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:update']);
+
     $response = $this->putJson('/api/v1/authors/999', [
         'name' => 'Machado',
         'last_name' => 'de Assis',
@@ -203,7 +241,26 @@ it('returns not found when updating a missing author', function () {
     $response->assertNotFound();
 });
 
+it('rejects updating an author without authentication', function () {
+    $author = Author::factory()->create();
+
+    $response = $this->putJson("/api/v1/authors/{$author->id}", ['name' => 'Updated Name']);
+
+    $response->assertUnauthorized();
+});
+
+it('rejects updating an author without the author:update ability', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:create']);
+    $author = Author::factory()->create();
+
+    $response = $this->putJson("/api/v1/authors/{$author->id}", ['name' => 'Updated Name']);
+
+    $response->assertForbidden();
+});
+
 it('deletes the specified author', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:delete']);
+
     $author = Author::factory()->create();
 
     $response = $this->deleteJson("/api/v1/authors/{$author->id}");
@@ -214,7 +271,26 @@ it('deletes the specified author', function () {
 });
 
 it('returns not found when deleting a missing author', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:delete']);
+
     $response = $this->deleteJson('/api/v1/authors/999');
 
     $response->assertNotFound();
+});
+
+it('rejects deleting an author without authentication', function () {
+    $author = Author::factory()->create();
+
+    $response = $this->deleteJson("/api/v1/authors/{$author->id}");
+
+    $response->assertUnauthorized();
+});
+
+it('rejects deleting an author without the author:delete ability', function () {
+    Sanctum::actingAs(User::factory()->create(), ['author:create']);
+    $author = Author::factory()->create();
+
+    $response = $this->deleteJson("/api/v1/authors/{$author->id}");
+
+    $response->assertForbidden();
 });
