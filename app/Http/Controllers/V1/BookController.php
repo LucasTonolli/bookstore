@@ -13,9 +13,20 @@ use App\Http\Resources\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class BookController extends Controller
+class BookController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(middleware: 'auth:sanctum', only: ['store', 'update', 'destroy']),
+            new Middleware(middleware: ['abilities:book:create'], only: ['store']),
+            new Middleware(middleware: ['abilities:book:update'], only: ['update']),
+            new Middleware(middleware: ['abilities:book:delete'], only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
