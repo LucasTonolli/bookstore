@@ -25,7 +25,7 @@ class AuthController extends Controller
         $user = Auth::user();
 
         return response()->json(status: Response::HTTP_OK, data: [
-            'token' => $user->createToken('token')->plainTextToken,
+            'token' => $user->createToken('token', $user->permissions())->plainTextToken,
             'data' => UserResource::make($user)
         ]);
     }
