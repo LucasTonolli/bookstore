@@ -72,7 +72,7 @@ class GenreController extends Controller implements HasMiddleware
         $genre->update($request->validated());
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Genre updated successfully',
-            'data' => $genre,
+            'data' => GenreResource::make($genre),
         ]);
     }
 
