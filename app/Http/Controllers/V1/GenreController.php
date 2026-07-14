@@ -42,7 +42,7 @@ class GenreController extends Controller implements HasMiddleware
     /**
      * Store a newly created resource in storage.
      */
-    public function store(SaveGenreRequest $request)
+    public function store(SaveGenreRequest $request): JsonResponse
     {
         $genre = Genre::create($request->validated());
 
