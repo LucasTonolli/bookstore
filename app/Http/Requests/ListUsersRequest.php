@@ -23,10 +23,12 @@ class ListUsersRequest extends FormRequest
      */
     public function rules(): array
     {
+        $roles = Roles::cases();
+        $roles = array_map(fn(Roles $role) => $role->value, $roles);
         return [
             'name' => ['string', 'max:255'],
             'email' => ['email'],
-            'role' => ['in:admin,user'],
+            'role' => ['in:' . implode(',', $roles)],
             'sort'      => ['sometimes', 'in:name,email,role,created_at'],
             'direction' => ['sometimes', 'in:asc,desc'],
             'per_page'  => ['sometimes', 'integer', 'min:1', 'max:100'],
