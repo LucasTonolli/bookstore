@@ -27,7 +27,7 @@ class ListUsersRequest extends FormRequest
         $roles = array_map(fn(Roles $role) => $role->value, $roles);
         return [
             'name' => ['string', 'max:255'],
-            'email' => ['email'],
+            'email' => ['string', 'max:255'],
             'role' => ['in:' . implode(',', $roles)],
             'sort'      => ['sometimes', 'in:name,email,role,created_at'],
             'direction' => ['sometimes', 'in:asc,desc'],
