@@ -3,6 +3,7 @@
 use App\Enums\Roles;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
@@ -48,6 +49,32 @@ it('filters users by name', function () {
     $response->assertSuccessful()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.name', 'Machado de Assis');
+});
+
+it('filters users by email', function () {
+    Sanctum::actingAs(User::factory()->create(['role' => Roles::Admin]), ['user:read']);
+    User::factory()->create(['email' => 'machado@example.com']);
+    User::factory()->create(['email' => 'clarice@example.com']);
+
+    $response = $this->getJson('/api/v1/users?email=machado');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.email', 'machado@example.com');
+});
+
+it('sorts users', function () {
+    // Named so it sorts after both fixtures below in descending order, since the
+    // authenticated admin is itself a row in the users table being sorted.
+    Sanctum::actingAs(User::factory()->create(['role' => Roles::Admin, 'name' => 'AAA Admin']), ['user:read']);
+    User::factory()->create(['name' => 'Zeta']);
+    User::factory()->create(['name' => 'Alpha']);
+
+    $response = $this->getJson('/api/v1/users?sort=name&direction=desc');
+
+    $response->assertSuccessful()
+        ->assertJsonPath('data.0.name', 'Zeta')
+        ->assertJsonPath('data.1.name', 'Alpha');
 });
 
 it('paginates users', function () {
@@ -154,6 +181,21 @@ it('rejects an invalid role when creating a user', function () {
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['role']);
+});
+
+it('rejects a name shorter than 3 characters when creating a user', function () {
+    Sanctum::actingAs(User::factory()->create(['role' => Roles::Admin]), ['user:create']);
+
+    $response = $this->postJson('/api/v1/users', [
+        'name' => 'ab',
+        'email' => 'machado@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'role' => 'staff',
+    ]);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['name']);
 });
 
 it('rejects creating a user without authentication', function () {
@@ -278,6 +320,43 @@ it('rejects updating a user to another user\'s email', function () {
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['email']);
+});
+
+it('updates a user\'s password without requiring confirmation', function () {
+    Sanctum::actingAs(User::factory()->create(['role' => Roles::Admin]), ['user:update']);
+    $user = User::factory()->create();
+
+    $response = $this->putJson("/api/v1/users/{$user->id}", [
+        'password' => 'new-password',
+    ]);
+
+    $response->assertSuccessful();
+
+    expect(Hash::check('new-password', $user->fresh()->password))->toBeTrue();
+});
+
+it('rejects a password shorter than 5 characters when updating a user', function () {
+    Sanctum::actingAs(User::factory()->create(['role' => Roles::Admin]), ['user:update']);
+    $user = User::factory()->create();
+
+    $response = $this->putJson("/api/v1/users/{$user->id}", [
+        'password' => 'ab',
+    ]);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['password']);
+});
+
+it('rejects a name shorter than 3 characters when updating a user', function () {
+    Sanctum::actingAs(User::factory()->create(['role' => Roles::Admin]), ['user:update']);
+    $user = User::factory()->create();
+
+    $response = $this->putJson("/api/v1/users/{$user->id}", [
+        'name' => 'ab',
+    ]);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['name']);
 });
 
 it('rejects an invalid role when updating a user', function () {
