@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 
 class ProfileTokenController extends Controller
 {
@@ -20,9 +19,9 @@ class ProfileTokenController extends Controller
 
     public function destroy(Request $request, string $id): JsonResponse|Response
     {
-        $user  = $request->user();
+        $user = $request->user();
         $token = $user->tokens()->find($id);
-        if (!$token) {
+        if (! $token) {
             return response()->json(status: JsonResponse::HTTP_NOT_FOUND, data: [
                 'message' => 'Token not found',
             ]);
