@@ -31,7 +31,7 @@ function verificationUrl(User $user, ?string $email = null, ?DateTimeInterface $
 
 it('sends a verification email to an unverified authenticated user', function () {
     Notification::fake();
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->create(['email_verified_at' => null]);
     Sanctum::actingAs($user, ['*']);
 
     $response = $this->postJson('/api/v1/email/verification-notification');
@@ -60,7 +60,7 @@ it('rejects sending a verification email without authentication', function () {
 
 it('throttles repeated verification email requests', function () {
     Notification::fake();
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->create();
     Sanctum::actingAs($user, ['*']);
 
     for ($i = 0; $i < 6; $i++) {
@@ -79,7 +79,7 @@ it('throttles repeated verification email requests', function () {
 
 it('verifies the authenticated user\'s email via a valid signed link', function () {
     Event::fake();
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->create(['email_verified_at' => null]);
     Sanctum::actingAs($user, ['*']);
 
     $response = $this->getJson(verificationUrl($user));
@@ -102,7 +102,7 @@ it('does not re-fire the Verified event when the email is already verified', fun
 });
 
 it('rejects a link with an invalid hash', function () {
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->create(['email_verified_at' => null]);
     Sanctum::actingAs($user, ['*']);
 
     $response = $this->getJson(verificationUrl($user, email: 'someone-else@example.com'));
@@ -112,17 +112,17 @@ it('rejects a link with an invalid hash', function () {
 });
 
 it('rejects an unsigned link', function () {
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->create(['email_verified_at' => null]);
     Sanctum::actingAs($user, ['*']);
 
-    $response = $this->getJson("/api/v1/email/verify/{$user->id}/".sha1($user->email));
+    $response = $this->getJson("/api/v1/email/verify/{$user->id}/" . sha1($user->email));
 
     $response->assertForbidden();
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
 });
 
 it('rejects an expired link', function () {
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->create(['email_verified_at' => null]);
     Sanctum::actingAs($user, ['*']);
 
     $response = $this->getJson(verificationUrl($user, expiresAt: now()->subMinute()));
@@ -132,8 +132,8 @@ it('rejects an expired link', function () {
 });
 
 it('rejects verifying when the link id does not match the authenticated user', function () {
-    $owner = User::factory()->unverified()->create();
-    $intruder = User::factory()->create();
+    $owner = User::factory()->create(['email_verified_at' => null]);
+    $intruder = User::factory()->create(['email_verified_at' => null]);
     Sanctum::actingAs($intruder, ['*']);
 
     $response = $this->getJson(verificationUrl($owner));
@@ -143,7 +143,7 @@ it('rejects verifying when the link id does not match the authenticated user', f
 });
 
 it('rejects verifying without authentication', function () {
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->create();
 
     $response = $this->getJson(verificationUrl($user));
 
