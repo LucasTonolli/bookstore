@@ -54,7 +54,6 @@ it('rejects an invalid email format on forgot-password', function () {
         ->assertJsonValidationErrors(['email']);
 });
 
-
 it('throttles a second reset link request for the same email', function () {
     Notification::fake();
     $user = User::factory()->create();

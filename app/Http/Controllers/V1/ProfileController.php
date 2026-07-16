@@ -32,6 +32,7 @@ class ProfileController extends Controller implements HasMiddleware
     {
         $user = $request->user();
         $user->update($request->validated());
+
         return response()->json(status: JsonResponse::HTTP_OK, data: [
             'message' => 'User updated successfully',
             'data' => UserResource::make($user->refresh()),
@@ -42,6 +43,7 @@ class ProfileController extends Controller implements HasMiddleware
     {
         $user = $request->user();
         $user->update(['password' => $request->password]);
+
         return response()->json(status: JsonResponse::HTTP_OK, data: [
             'message' => 'Password updated successfully',
             'data' => UserResource::make($user->refresh()),

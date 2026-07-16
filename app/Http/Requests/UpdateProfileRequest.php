@@ -8,7 +8,6 @@ use Illuminate\Validation\Rule;
 
 class UpdateProfileRequest extends FormRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      *

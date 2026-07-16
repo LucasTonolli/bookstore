@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\GenreFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
 #[Fillable('name', 'slug')]
 class Genre extends Model
 {
-    /** @use HasFactory<\Database\Factories\GenreFactory> */
+    /** @use HasFactory<GenreFactory> */
     use HasFactory;
 
     public function books(): BelongsToMany
@@ -37,8 +38,9 @@ class Genre extends Model
         $slug = Str::slug($name);
         $countSameSlug = Genre::whereLike('slug', "$slug%")->count();
         if ($countSameSlug) {
-            $slug .= '-' . $countSameSlug;
+            $slug .= '-'.$countSameSlug;
         }
+
         return $slug;
     }
 }

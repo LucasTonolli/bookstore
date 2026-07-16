@@ -24,12 +24,13 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         $roles = Roles::cases();
-        $roles = array_map(fn(Roles $role) => $role->value, $roles);
+        $roles = array_map(fn (Roles $role) => $role->value, $roles);
+
         return [
             'name' => ['required', 'string', 'min:3', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'confirmed', 'min:5'],
-            'role' => ['required', 'in:' . implode(',', $roles)],
+            'role' => ['required', 'in:'.implode(',', $roles)],
         ];
     }
 }

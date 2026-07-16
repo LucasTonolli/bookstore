@@ -2,10 +2,7 @@
 
 namespace App\Listeners;
 
-
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
 class DeleteUserTokens
 {

@@ -19,7 +19,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -31,15 +31,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'role' => Roles::class
+            'role' => Roles::class,
         ];
     }
 
     public function permissions(): array
     {
-        if (!$this->role) {
+        if (! $this->role) {
             return [];
         }
+
         return $this->role->permissions();
     }
 }

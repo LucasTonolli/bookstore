@@ -24,6 +24,7 @@ class AuthorController extends Controller implements HasMiddleware
             new Middleware(middleware: ['abilities:author:delete'], only: ['destroy']),
         ];
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -32,11 +33,11 @@ class AuthorController extends Controller implements HasMiddleware
         $filters = $request->validated();
 
         $results = Author::query()
-            ->when(isset($filters['name']), fn($query) => $query->where('name', 'like', "%{$filters['name']}%"))
-            ->when(isset($filters['last_name']), fn($query) => $query->where('last_name', 'like', "%{$filters['last_name']}%"))
-            ->when(isset($filters['nationality']), fn($query) => $query->where('nationality', 'like', "%{$filters['nationality']}%"))
-            ->when(isset($filters['birth_date']), fn($query) => $query->whereDate('birth_date', $filters['birth_date']))
-            ->when(isset($filters['sort']), fn($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
+            ->when(isset($filters['name']), fn ($query) => $query->where('name', 'like', "%{$filters['name']}%"))
+            ->when(isset($filters['last_name']), fn ($query) => $query->where('last_name', 'like', "%{$filters['last_name']}%"))
+            ->when(isset($filters['nationality']), fn ($query) => $query->where('nationality', 'like', "%{$filters['nationality']}%"))
+            ->when(isset($filters['birth_date']), fn ($query) => $query->whereDate('birth_date', $filters['birth_date']))
+            ->when(isset($filters['sort']), fn ($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
             ->paginate($filters['per_page'] ?? 15, ['*'], 'page', $filters['page'] ?? 1);
 
         return response()->json(status: Response::HTTP_OK, data: AuthorCollection::make($results));
@@ -48,6 +49,7 @@ class AuthorController extends Controller implements HasMiddleware
     public function store(SaveAuthorRequest $request): JsonResponse
     {
         $result = Author::create($request->validated());
+
         return response()->json(status: Response::HTTP_CREATED, data: [
             'message' => 'Author created successfully',
             'data' => AuthorResource::make($result),

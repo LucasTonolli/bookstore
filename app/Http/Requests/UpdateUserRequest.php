@@ -25,12 +25,13 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         $roles = Roles::cases();
-        $roles = array_map(fn(Roles $role) => $role->value, $roles);
+        $roles = array_map(fn (Roles $role) => $role->value, $roles);
+
         return [
             'name' => ['sometimes', 'string', 'min:3', 'max:255'],
             'email' => ['sometimes', 'email', Rule::unique('users')->ignore($this->user->id)],
             'password' => ['sometimes', 'min:5'],
-            'role' => ['sometimes', 'in:' . implode(',', $roles)],
+            'role' => ['sometimes', 'in:'.implode(',', $roles)],
         ];
     }
 }

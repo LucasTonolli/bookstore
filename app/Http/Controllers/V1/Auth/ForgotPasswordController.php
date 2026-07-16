@@ -4,11 +4,11 @@ namespace App\Http\Controllers\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ResetPasswordRequest;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-
 
 class ForgotPasswordController extends Controller
 {
@@ -37,7 +37,7 @@ class ForgotPasswordController extends Controller
             $validated,
             function ($user) use ($validated) {
                 $user->update(['password' => Hash::make($validated['password'])]);
-                event(new \Illuminate\Auth\Events\PasswordReset($user));
+                event(new PasswordReset($user));
             }
         );
 

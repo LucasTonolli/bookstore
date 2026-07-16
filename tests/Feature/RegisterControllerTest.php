@@ -38,7 +38,6 @@ it('creates the user in the database with a hashed password', function () {
     expect(Hash::check('password', $user->password))->toBeTrue();
 });
 
-
 it('requires a name', function () {
     $response = $this->postJson('/api/v1/auth/register', [
         'email' => 'machado@example.com',

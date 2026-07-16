@@ -24,6 +24,7 @@ class GenreController extends Controller implements HasMiddleware
             new Middleware(middleware: ['abilities:genre:delete'], only: ['destroy']),
         ];
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -32,8 +33,8 @@ class GenreController extends Controller implements HasMiddleware
         $filters = $request->validated();
 
         $results = Genre::query()
-            ->when(isset($filters['name']), fn($query) => $query->where('name', 'like', "%{$filters['name']}%"))
-            ->when(isset($filters['sort']), fn($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
+            ->when(isset($filters['name']), fn ($query) => $query->where('name', 'like', "%{$filters['name']}%"))
+            ->when(isset($filters['sort']), fn ($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
             ->paginate($filters['per_page'] ?? 15, ['*'], 'page', $filters['page'] ?? 1);
 
         return response()->json(status: Response::HTTP_OK, data: GenreCollection::make($results));
@@ -63,13 +64,13 @@ class GenreController extends Controller implements HasMiddleware
         ]);
     }
 
-
     /**
      * Update the specified resource in storage.
      */
     public function update(SaveGenreRequest $request, Genre $genre): JsonResponse
     {
         $genre->update($request->validated());
+
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Genre updated successfully',
             'data' => GenreResource::make($genre),
@@ -82,6 +83,7 @@ class GenreController extends Controller implements HasMiddleware
     public function destroy(Genre $genre): Response
     {
         $genre->delete();
+
         return response()->noContent();
     }
 }
