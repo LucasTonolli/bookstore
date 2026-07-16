@@ -24,8 +24,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('users', UserController::class);
 
     Route::prefix('/auth')->group(function () {
-        Route::post('/register', RegisterController::class);
-        Route::post('/login', [AuthController::class, 'login'])->name('login');
+        Route::post('/register', RegisterController::class)->middleware('throttle:1,1');
+        Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('throttle:10,1');
         Route::delete('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
         Route::post('/forgot-password', [ForgotPasswordController::class, 'forgotPassword'])->middleware('throttle:1,1');
         Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->middleware('throttle:10,1');
