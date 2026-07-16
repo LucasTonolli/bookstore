@@ -18,6 +18,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/register', \App\Http\Controllers\V1\Auth\RegisterController::class);
         Route::post('/login', [\App\Http\Controllers\V1\Auth\AuthController::class, 'login'])->name('login');
         Route::delete('/logout', [\App\Http\Controllers\V1\Auth\AuthController::class, 'logout'])->middleware('auth:sanctum');
+        Route::post('/forgot-password', [\App\Http\Controllers\V1\Auth\ForgotPasswordController::class, 'forgotPassword'])->middleware('throttle:1,1');
+        Route::post('/reset-password', [\App\Http\Controllers\V1\Auth\ForgotPasswordController::class, 'resetPassword'])->middleware('throttle:10,1');
     });
 
     Route::prefix('/profile')->group(function () {
