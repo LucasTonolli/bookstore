@@ -13,6 +13,7 @@ A REST API for managing a bookstore catalog — authors, genres, books, and user
 - Every write endpoint (`store`/`update`/`destroy`) requires a Sanctum token with the matching ability (e.g. `author:create`, `book:delete`); author/genre/book reads are public, user management is admin-only end to end
 - Self-service profile endpoints let any authenticated user view/update their own name, email, and password (password changes require the current password), independent of role
 - Email verification via Laravel's built-in signed-URL flow, adapted to return JSON: request a link, then confirm it
+- Forgot/reset password via Laravel's Password broker: requesting a link never reveals whether the email is registered, and a successful reset revokes all of the user's existing Sanctum tokens
 
 ## Tech Stack
 
@@ -50,6 +51,8 @@ Each resource exposes standard REST endpoints:
 | POST      | `/api/v1/auth/register` | Register user (always created with the `client` role)                                             |
 | POST      | `/api/v1/auth/login`    | Login                                                                                              |
 | DELETE    | `/api/v1/auth/logout`   | Logout (revokes the current token)                                                                 |
+| POST      | `/api/v1/auth/forgot-password` | Request a password reset link (1/min; always responds success, regardless of whether the email exists) |
+| POST      | `/api/v1/auth/reset-password` | Reset the password with `token`/`email`/`password` (10/min; revokes all of the user's tokens on success) |
 | GET       | `/api/v1/profile`       | Return the authenticated user's own data                                                          |
 | PUT       | `/api/v1/profile`       | Update the authenticated user's own name/email (`role` in the payload is ignored)                 |
 | PUT       | `/api/v1/profile/password` | Update the authenticated user's own password (requires `current_password`)                     |
@@ -105,4 +108,5 @@ Tests run against an isolated in-memory SQLite database (see `phpunit.xml`) and 
 - `app/Actions/Books` — book create/update logic (including author/genre attach & sync)
 - `app/Models` — `Author`, `Genre`, `Book`, `User` (with slug generation on `Genre`/`Book`)
 - `app/Enums/Roles.php` — role definitions and their Sanctum ability lists
+- `app/Listeners/DeleteUserTokens.php` — revokes a user's Sanctum tokens on `PasswordReset`
 - `tests/Feature` — feature tests per controller
