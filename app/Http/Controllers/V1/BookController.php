@@ -59,14 +59,8 @@ class BookController extends Controller implements HasMiddleware
      */
     public function store(StoreBookRequest $request, CreateBookAction $action): JsonResponse
     {
-        try {
-            $book = $action->handle($request->validated());
-        } catch (\Exception $e) {
-            return response()->json(status: Response::HTTP_INTERNAL_SERVER_ERROR, data: [
-                'message' => 'Failed to create book',
-                'error' => $e->getMessage(),
-            ]);
-        }
+
+        $book = $action->handle($request->validated());
 
         return response()->json(status: Response::HTTP_CREATED, data: [
             'message' => 'Book created successfully',
@@ -92,14 +86,7 @@ class BookController extends Controller implements HasMiddleware
      */
     public function update(UpdateBookRequest $request, Book $book, UpdateBookAction $action): JsonResponse
     {
-        try {
-            $book = $action->handle($book, $request->validated());
-        } catch (\Exception $e) {
-            return response()->json(status: Response::HTTP_INTERNAL_SERVER_ERROR, data: [
-                'message' => 'Failed to update book',
-                'error' => $e->getMessage(),
-            ]);
-        }
+        $book = $action->handle($book, $request->validated());
 
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Book updated successfully',
