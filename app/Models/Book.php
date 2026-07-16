@@ -55,7 +55,7 @@ class Book extends Model
         $sameSlugCount = Book::whereLike('slug', "$baseSlug%")->where('id', '!=', $book->id)->count();
 
         if ($sameSlugCount) {
-            $baseSlug .= '-'.$sameSlugCount;
+            $baseSlug .= '-' . $sameSlugCount;
         }
 
         return $baseSlug;
