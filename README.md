@@ -11,6 +11,7 @@ A REST API for managing a bookstore catalog — authors, genres, books, and user
 - Form Request validation, API Resources for responses, and Action classes for the book create/update flow
 - Role-based authorization: each user has a role (`admin`, `staff`, `client`) that maps to a fixed set of Sanctum token abilities (`App\Enums\Roles::permissions()`), granted at register/login time
 - Every write endpoint (`store`/`update`/`destroy`) requires a Sanctum token with the matching ability (e.g. `author:create`, `book:delete`); author/genre/book reads are public, user management is admin-only end to end
+- Self-service profile endpoints let any authenticated user view/update their own name, email, and password (password changes require the current password), independent of role
 
 ## Tech Stack
 
@@ -48,6 +49,9 @@ Each resource exposes standard REST endpoints:
 | POST      | `/api/v1/auth/register` | Register user (always created with the `client` role)                                             |
 | POST      | `/api/v1/auth/login`    | Login                                                                                              |
 | DELETE    | `/api/v1/auth/logout`   | Logout (revokes the current token)                                                                 |
+| GET       | `/api/v1/profile`       | Return the authenticated user's own data                                                          |
+| PUT       | `/api/v1/profile`       | Update the authenticated user's own name/email (`role` in the payload is ignored)                 |
+| PUT       | `/api/v1/profile/password` | Update the authenticated user's own password (requires `current_password`)                     |
 
 ## Roles & Permissions
 
@@ -59,7 +63,7 @@ Every user has a role (`App\Enums\Roles`), and each role maps to a fixed list of
 | `staff`  | Everything `client` has, plus `create`/`update`/`delete` on books, genres, and authors |
 | `admin`  | `*` (every ability, including full user management)                          |
 
-Only `admin` can manage users (`/api/v1/users/*`), since no role is granted `user:*` abilities explicitly.
+Only `admin` can manage users (`/api/v1/users/*`), since no role is granted `user:*` abilities explicitly. The `/api/v1/profile/*` endpoints are the exception — they only require a valid Sanctum token (no specific ability), since they always act on the token's own owner rather than an arbitrary user.
 
 ## Getting Started
 
