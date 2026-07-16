@@ -19,4 +19,10 @@ Route::prefix('v1')->group(function () {
         Route::post('/login', [\App\Http\Controllers\V1\Auth\AuthController::class, 'login'])->name('login');
         Route::delete('/logout', [\App\Http\Controllers\V1\Auth\AuthController::class, 'logout'])->middleware('auth:sanctum');
     });
+
+    Route::prefix('/profile')->group(function () {
+        Route::get('/', [\App\Http\Controllers\V1\ProfileController::class, 'show'])->middleware('auth:sanctum');
+        Route::put('/', [\App\Http\Controllers\V1\ProfileController::class, 'update'])->middleware('auth:sanctum');
+        Route::put('/password', [\App\Http\Controllers\V1\ProfileController::class, 'updatePassword'])->middleware('auth:sanctum');
+    });
 });
