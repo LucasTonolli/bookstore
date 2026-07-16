@@ -25,4 +25,9 @@ Route::prefix('v1')->group(function () {
         Route::put('/', [\App\Http\Controllers\V1\ProfileController::class, 'update'])->middleware('auth:sanctum');
         Route::put('/password', [\App\Http\Controllers\V1\ProfileController::class, 'updatePassword'])->middleware('auth:sanctum');
     });
+
+    Route::prefix('/email')->group(function () {
+        Route::post('/verification-notification', [\App\Http\Controllers\V1\EmailVerificationController::class, 'send'])->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
+        Route::get('/verify/{id}/{hash}', [\App\Http\Controllers\V1\EmailVerificationController::class, 'verify'])->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+    });
 });
