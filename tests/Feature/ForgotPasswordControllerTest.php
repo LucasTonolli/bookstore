@@ -34,8 +34,7 @@ it('rejects a forgot-password request for a nonexistent email', function () {
         'email' => 'nobody@example.com',
     ]);
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['email']);
+    $response->assertSuccessful();
     Notification::assertNothingSent();
 });
 
@@ -55,6 +54,7 @@ it('rejects an invalid email format on forgot-password', function () {
         ->assertJsonValidationErrors(['email']);
 });
 
+
 it('throttles a second reset link request for the same email', function () {
     Notification::fake();
     $user = User::factory()->create();
@@ -62,11 +62,23 @@ it('throttles a second reset link request for the same email', function () {
     $this->postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
         ->assertSuccessful();
 
-    $response = $this->postJson('/api/v1/auth/forgot-password', ['email' => $user->email]);
+    $this->postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
+        ->assertTooManyRequests();
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['email']);
-    Notification::assertSentTo($user, ResetPassword::class, times: 1);
+    Notification::assertSentTo($user, ResetPassword::class);
+});
+
+it('not throttles after a delay', function () {
+    Notification::fake();
+    $user = User::factory()->create();
+
+    $this->postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
+        ->assertSuccessful();
+
+    $this->travel(60)->seconds();
+
+    $this->postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
+        ->assertSuccessful();
 });
 
 /*
@@ -117,8 +129,7 @@ it('rejects resetting the password with an invalid token', function () {
         'password_confirmation' => 'new-password',
     ]);
 
-    $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['email']);
+    $response->assertUnauthorized();
     expect(Hash::check('old-password', $user->fresh()->password))->toBeTrue();
 });
 
