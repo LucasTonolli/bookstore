@@ -14,6 +14,7 @@ A REST API for managing a bookstore catalog — authors, genres, books, and user
 - Self-service profile endpoints let any authenticated user view/update their own name, email, and password (password changes require the current password), independent of role
 - Email verification via Laravel's built-in signed-URL flow, adapted to return JSON: request a link, then confirm it
 - Forgot/reset password via Laravel's Password broker: requesting a link never reveals whether the email is registered, and a successful reset revokes all of the user's existing Sanctum tokens
+- Session management: a user can list their own active Sanctum tokens and revoke one or all of them (their current token is protected from self-revocation through this endpoint)
 
 ## Tech Stack
 
@@ -56,6 +57,9 @@ Each resource exposes standard REST endpoints:
 | GET       | `/api/v1/profile`       | Return the authenticated user's own data                                                          |
 | PUT       | `/api/v1/profile`       | Update the authenticated user's own name/email (`role` in the payload is ignored)                 |
 | PUT       | `/api/v1/profile/password` | Update the authenticated user's own password (requires `current_password`)                     |
+| GET       | `/api/v1/profile/tokens` | List the authenticated user's own active tokens                                                    |
+| DELETE    | `/api/v1/profile/tokens/{id}` | Revoke a specific token (400 if it's the token making the request)                             |
+| DELETE    | `/api/v1/profile/tokens` | Revoke all of the user's tokens except the one making the request                                  |
 | POST      | `/api/v1/email/verification-notification` | Resend the email verification link (throttled, 6/min)                            |
 | GET       | `/api/v1/email/verify/{id}/{hash}` | Confirm the signed verification link                                                     |
 
