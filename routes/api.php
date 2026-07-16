@@ -8,6 +8,7 @@ use App\Http\Controllers\V1\BookController;
 use App\Http\Controllers\V1\EmailVerificationController;
 use App\Http\Controllers\V1\GenreController;
 use App\Http\Controllers\V1\ProfileController;
+use App\Http\Controllers\V1\ProfileTokenController;
 use App\Http\Controllers\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,10 +31,13 @@ Route::prefix('v1')->group(function () {
         Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->middleware('throttle:10,1');
     });
 
-    Route::prefix('/profile')->group(function () {
-        Route::get('/', [ProfileController::class, 'show'])->middleware('auth:sanctum');
-        Route::put('/', [ProfileController::class, 'update'])->middleware('auth:sanctum');
-        Route::put('/password', [ProfileController::class, 'updatePassword'])->middleware('auth:sanctum');
+    Route::prefix('/profile')->middleware('auth:sanctum')->group(function () {
+        Route::get('/', [ProfileController::class, 'show']);
+        Route::put('/', [ProfileController::class, 'update']);
+        Route::put('/password', [ProfileController::class, 'updatePassword']);
+        Route::get('/tokens', [ProfileTokenController::class, 'index']);
+        Route::delete('/tokens/{token}', [ProfileTokenController::class, 'destroy']);
+        Route::delete('/tokens', [ProfileTokenController::class, 'destroyAll']);
     });
 
     Route::prefix('/email')->group(function () {
