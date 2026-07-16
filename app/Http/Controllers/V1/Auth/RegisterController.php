@@ -24,19 +24,19 @@ class RegisterController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => $validated['password'],
-                'role' => Roles::Client
+                'role' => Roles::Client,
             ]);
 
             return [
                 $user,
-                $user->createToken('token', $user->permissions())
+                $user->createToken('token', $user->permissions()),
             ];
         });
 
         return response()->json(status: Response::HTTP_CREATED, data: [
             'message' => 'User created successfully',
-            'token'  => $token->plainTextToken,
-            'data'  => UserResource::make($user)
+            'token' => $token->plainTextToken,
+            'data' => UserResource::make($user),
         ]);
     }
 }

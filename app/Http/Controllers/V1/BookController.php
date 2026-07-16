@@ -11,8 +11,8 @@ use App\Http\Requests\UpdateBookRequest;
 use App\Http\Resources\BookCollection;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
-use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -27,6 +27,7 @@ class BookController extends Controller implements HasMiddleware
             new Middleware(middleware: ['abilities:book:delete'], only: ['destroy']),
         ];
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -37,16 +38,16 @@ class BookController extends Controller implements HasMiddleware
         $filters = $request->validated();
 
         $results = $books
-            ->when(isset($filters['title']), fn($query) => $query->where('title', 'like', "%{$filters['title']}%"))
-            ->when(isset($filters['subtitle']), fn($query) => $query->where('subtitle', 'like', "%{$filters['subtitle']}%"))
-            ->when(isset($filters['published_year']), fn($query) => $query->where('published_year', $filters['published_year']))
-            ->when(isset($filters['isbn']), fn($query) => $query->where('isbn', 'like', "%{$filters['isbn']}%"))
-            ->when(isset($filters['pages']), fn($query) => $query->where('pages', $filters['pages']))
-            ->when(isset($filters['edition']), fn($query) => $query->where('edition', 'like', "%{$filters['edition']}%"))
-            ->when(isset($filters['publisher']), fn($query) => $query->where('publisher', 'like', "%{$filters['publisher']}%"))
-            ->when(isset($filters['language']), fn($query) => $query->where('language', 'like', "%{$filters['language']}%"))
-            ->when(isset($filters['description']), fn($query) => $query->where('description', 'like', "%{$filters['description']}%"))
-            ->when(isset($filters['sort']), fn($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
+            ->when(isset($filters['title']), fn ($query) => $query->where('title', 'like', "%{$filters['title']}%"))
+            ->when(isset($filters['subtitle']), fn ($query) => $query->where('subtitle', 'like', "%{$filters['subtitle']}%"))
+            ->when(isset($filters['published_year']), fn ($query) => $query->where('published_year', $filters['published_year']))
+            ->when(isset($filters['isbn']), fn ($query) => $query->where('isbn', 'like', "%{$filters['isbn']}%"))
+            ->when(isset($filters['pages']), fn ($query) => $query->where('pages', $filters['pages']))
+            ->when(isset($filters['edition']), fn ($query) => $query->where('edition', 'like', "%{$filters['edition']}%"))
+            ->when(isset($filters['publisher']), fn ($query) => $query->where('publisher', 'like', "%{$filters['publisher']}%"))
+            ->when(isset($filters['language']), fn ($query) => $query->where('language', 'like', "%{$filters['language']}%"))
+            ->when(isset($filters['description']), fn ($query) => $query->where('description', 'like', "%{$filters['description']}%"))
+            ->when(isset($filters['sort']), fn ($query) => $query->orderBy($filters['sort'], $filters['direction'] ?? 'asc'))
             ->with(['authors', 'genres'])
             ->paginate($filters['per_page'] ?? 15, ['*'], 'page', $filters['page'] ?? 1);
 
@@ -66,6 +67,7 @@ class BookController extends Controller implements HasMiddleware
                 'error' => $e->getMessage(),
             ]);
         }
+
         return response()->json(status: Response::HTTP_CREATED, data: [
             'message' => 'Book created successfully',
             'data' => BookResource::make($book),
@@ -98,6 +100,7 @@ class BookController extends Controller implements HasMiddleware
                 'error' => $e->getMessage(),
             ]);
         }
+
         return response()->json(status: Response::HTTP_OK, data: [
             'message' => 'Book updated successfully',
             'data' => BookResource::make($book),
@@ -110,6 +113,7 @@ class BookController extends Controller implements HasMiddleware
     public function destroy(Book $book): Response
     {
         $book->delete();
+
         return response()->noContent();
     }
 }

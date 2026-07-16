@@ -115,7 +115,7 @@ it('rejects an unsigned link', function () {
     $user = User::factory()->create(['email_verified_at' => null]);
     Sanctum::actingAs($user, ['*']);
 
-    $response = $this->getJson("/api/v1/email/verify/{$user->id}/" . sha1($user->email));
+    $response = $this->getJson("/api/v1/email/verify/{$user->id}/".sha1($user->email));
 
     $response->assertForbidden();
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();

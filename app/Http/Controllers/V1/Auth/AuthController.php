@@ -16,9 +16,9 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        if (!Auth::attempt($validated)) {
+        if (! Auth::attempt($validated)) {
             return response()->json(status: Response::HTTP_UNAUTHORIZED, data: [
-                'message' => 'The provided credentials are incorrect.'
+                'message' => 'The provided credentials are incorrect.',
             ]);
         }
 
@@ -26,7 +26,7 @@ class AuthController extends Controller
 
         return response()->json(status: Response::HTTP_OK, data: [
             'token' => $user->createToken('token', $user->permissions())->plainTextToken,
-            'data' => UserResource::make($user)
+            'data' => UserResource::make($user),
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\BookFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,11 +18,11 @@ use Illuminate\Support\Str;
     'edition',
     'publisher',
     'language',
-    'description'
+    'description',
 ])]
 class Book extends Model
 {
-    /** @use HasFactory<\Database\Factories\BookFactory> */
+    /** @use HasFactory<BookFactory> */
     use HasFactory;
 
     public function authors(): BelongsToMany
@@ -52,9 +53,8 @@ class Book extends Model
         $sameSlugCount = Book::whereLike('slug', "$baseSlug%")->count();
 
         if ($sameSlugCount) {
-            $baseSlug .= '-' . $sameSlugCount;
+            $baseSlug .= '-'.$sameSlugCount;
         }
-
 
         return $baseSlug;
     }

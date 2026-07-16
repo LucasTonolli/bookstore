@@ -18,7 +18,7 @@ class UpdateProfilePasswordRequest extends FormRequest
     {
         return [
             'password' => ['required', 'confirmed', 'min:5'],
-            'current_password' => ['required']
+            'current_password' => ['required'],
         ];
     }
 
@@ -26,10 +26,10 @@ class UpdateProfilePasswordRequest extends FormRequest
     {
         return [
             function (Validator $validator) {
-                if (!Hash::check($this->current_password, $this->user('sanctum')->password)) {
+                if (! Hash::check($this->current_password, $this->user('sanctum')->password)) {
                     $validator->errors()->add('current_password', 'Current password is incorrect');
                 }
-            }
+            },
         ];
     }
 }

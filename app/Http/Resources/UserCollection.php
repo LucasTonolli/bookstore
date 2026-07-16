@@ -24,7 +24,7 @@ class UserCollection extends ResourceCollection
                 'last_page' => $this->lastPage(),
                 'next' => $this->nextPageUrl(),
                 'prev' => $this->previousPageUrl(),
-            ]
+            ],
         ];
     }
 }
