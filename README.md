@@ -12,6 +12,7 @@ A REST API for managing a bookstore catalog — authors, genres, books, and user
 - Role-based authorization: each user has a role (`admin`, `staff`, `client`) that maps to a fixed set of Sanctum token abilities (`App\Enums\Roles::permissions()`), granted at register/login time
 - Every write endpoint (`store`/`update`/`destroy`) requires a Sanctum token with the matching ability (e.g. `author:create`, `book:delete`); author/genre/book reads are public, user management is admin-only end to end
 - Self-service profile endpoints let any authenticated user view/update their own name, email, and password (password changes require the current password), independent of role
+- Email verification via Laravel's built-in signed-URL flow, adapted to return JSON: request a link, then confirm it
 
 ## Tech Stack
 
@@ -52,6 +53,8 @@ Each resource exposes standard REST endpoints:
 | GET       | `/api/v1/profile`       | Return the authenticated user's own data                                                          |
 | PUT       | `/api/v1/profile`       | Update the authenticated user's own name/email (`role` in the payload is ignored)                 |
 | PUT       | `/api/v1/profile/password` | Update the authenticated user's own password (requires `current_password`)                     |
+| POST      | `/api/v1/email/verification-notification` | Resend the email verification link (throttled, 6/min)                            |
+| GET       | `/api/v1/email/verify/{id}/{hash}` | Confirm the signed verification link                                                     |
 
 ## Roles & Permissions
 
