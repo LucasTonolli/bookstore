@@ -36,9 +36,9 @@ class Genre extends Model
     private function generateSlug(string $name): string
     {
         $slug = Str::slug($name);
-        $countSameSlug = Genre::whereLike('slug', "$slug%")->count();
+        $countSameSlug = Genre::whereLike('slug', "$slug%")->where('id', '!=', $this->id)->count();
         if ($countSameSlug) {
-            $slug .= '-'.$countSameSlug;
+            $slug .= '-' . $countSameSlug;
         }
 
         return $slug;

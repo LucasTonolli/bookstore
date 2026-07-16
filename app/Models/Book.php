@@ -42,7 +42,9 @@ class Book extends Model
         });
 
         static::updating(function (Book $book) {
-            $book->slug = $book->generateSlug($book);
+            if ($book->isDirty('title', 'subtitle', 'published_year')) {
+                $book->slug = $book->generateSlug($book);
+            }
         });
     }
 
@@ -50,10 +52,10 @@ class Book extends Model
     {
         $baseSlug = Str::slug("{$book->title} {$book->subtitle} {$book->published_year}");
 
-        $sameSlugCount = Book::whereLike('slug', "$baseSlug%")->count();
+        $sameSlugCount = Book::whereLike('slug', "$baseSlug%")->where('id', '!=', $book->id)->count();
 
         if ($sameSlugCount) {
-            $baseSlug .= '-'.$sameSlugCount;
+            $baseSlug .= '-' . $sameSlugCount;
         }
 
         return $baseSlug;
